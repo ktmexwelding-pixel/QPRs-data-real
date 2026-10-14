@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+  <title>Weld Quality Monitor</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f5fa;
+      color: #172b4d;
+      margin: 0;
+      padding: 24px;
+    }
+
+    main {
+      max-width: 850px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      margin: 16px 0;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px #0001;
+    }
+
+    input, select, button {
+      padding: 12px;
+      margin: 6px 0;
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 7px;
+      border: 1px solid #ccd5e0;
+    }
+
+    button {
+      background: #175cd3;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1045a0;
+    }
+
+    .stats {
+      display: flex;
+      gap: 15px;
+    }
+
+    .stats .card {
+      flex: 1;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    td, th {
+      border-bottom: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+  </style>
+</head>
+
+<body>
+<main>
+
+  <h1>Weld Quality Monitor</h1>
+  <p>Registro de defectos de soldadura</p>
+
+  <section class="stats">
+    <div class="card">
+      <h3>Defectos registrados</h3>
+      <h1 id="total">0</h1>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Nuevo registro</h2>
+
+    <label for="estacion">Estación</label>
+    <select id="estacion">
+      <option>W145</option>
+      <option>W146</option>
+      <option>W147</option>
+      <option>W148</option>
+    </select>
+
+    <label for="defecto">Tipo de defecto</label>
+    <select id="defecto">
+      <option>Punto frío</option>
+      <option>Expulsión</option>
+      <option>Pin hole</option>
+      <option>Tuerca incorrecta</option>
+    </select>
+
+    <button onclick="registrar()">
+      Guardar registro
+    </button>
+  </section>
+
+  <section class="card">
+    <h2>Historial de defectos</h2>
+
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Estación</th>
+            <th>Defecto</th>
+          </tr>
+        </thead>
+        <tbody id="historial"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  let registros = JSON.parse(
+    localStorage.getItem("defectos") || "[]"
+  );
+
+  function registrar() {
+    const estacion =
+      document.getElementById("estacion").value;
+
+    const defecto =
+      document.getElementById("defecto").value;
+
+    registros.push({
+      fecha: new Date().toLocaleString("es-MX"),
+      estacion: estacion,
+      defecto: defecto
+    });
+
+    localStorage.setItem(
+      "defectos",
+      JSON.stringify(registros)
+    );
+
+    actualizar();
+  }
+
+  function actualizar() {
+    document.getElementById("total").textContent =
+      registros.length;
+
+    const tabla =
+      document.getElementById("historial");
+
+    tabla.replaceChildren();
+
+    registros.forEach(r => {
+      const fila = document.createElement("tr");
+
+      [r.fecha, r.estacion, r.defecto].forEach(valor => {
+        const celda = document.createElement("td");
+        celda.textContent = valor;
+        fila.appendChild(celda);
+      });
+
+      tabla.appendChild(fila);
+    });
+  }
+
+  actualizar();
+</script>
+
+</body>
+</html>
